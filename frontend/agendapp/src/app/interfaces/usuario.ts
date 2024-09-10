@@ -1,5 +1,3 @@
-import { Rol, Cita } from './api';
-
 export interface Usuario {
   idUsuario: number;
   dni: string;
@@ -8,9 +6,5 @@ export interface Usuario {
   email: string;
   telefono: string;
   contrasenia: string;
-  idRol: Rol;
-  idRolNavigation: null;
-  administradores: [];
-  medicos: [];
-  pacientes: [];
+  idRol: number;  
 }

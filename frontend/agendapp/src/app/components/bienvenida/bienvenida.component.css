@@ -4,7 +4,7 @@
   background-color: #009788;
   object-fit: cover;
   padding: 2rem 0px;
-  height: 100vh;
+  height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -19,11 +19,9 @@
   align-items: center;
 }
 
-/* img{
-    width: inherit;
-    position: absolute;
-    z-index: -100;
-} */
+.bt-register{
+  border-color: #0d5dd3;
+}
 
 .boton-container {
   position: absolute;
@@ -46,7 +44,7 @@
   .background {
     background-color: #009788;
     object-fit: cover;
-    height: 100vh;
+    height: 100dvh;
     display: flex;
     justify-content: center;
     align-items: center;

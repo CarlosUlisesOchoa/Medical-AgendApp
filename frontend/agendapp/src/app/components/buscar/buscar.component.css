@@ -11,7 +11,6 @@
   justify-content: center;
   align-items: center;
   font-weight: 500;
-  background-color: #f5f5f5;
   margin-top: 1rem;
 }
 
@@ -37,7 +36,7 @@ input.form-control {
 }
 
 input::placeholder {
-  color: #c4bfbf;
+  color: #727272;
 }
 
 tr {
@@ -45,9 +44,6 @@ tr {
   cursor: pointer;
 }
 
-tr:hover {
-  background-color: #f0e98f;
-}
 
 th,
 td {
@@ -55,6 +51,7 @@ td {
   align-items: center;
   text-align: center;
 }
+
 
 li {
   text-decoration: none;

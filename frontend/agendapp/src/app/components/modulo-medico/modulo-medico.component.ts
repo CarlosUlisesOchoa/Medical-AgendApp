@@ -1,14 +1,20 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Component, inject, OnInit } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
+import { FilterPipe } from '../../services/filter.pipe';
 import { NavbarusuariologueadoComponent } from '../../shared/navbarusuariologueado/navbarusuariologueado.component';
 import { FooterComponent } from '../../shared/footer/footer.component';
-import { LocalStorageService } from '../../services/local-storage.service';
-import { FormsModule } from '@angular/forms';
-import { FilterPipe } from '../../services/filter.pipe';
-import { CommonModule } from '@angular/common';
-import { ApiProviderService } from '../../services/api-provider.service';
-import { Cita } from '../../interfaces/api';
+
+import { ApiService } from '../../services/api.service';
+import { CitasService } from '../../services/citas.service';
+import { AuthService } from '../../services/auth.service';
+import { MedicosService } from '../../services/medicos.service';
+
+import { Medico } from '../../interfaces/medico';
 import { Usuario } from '../../interfaces/usuario';
+import { Cita } from '../../interfaces/cita';
 
 @Component({
   selector: 'app-modulo-medico',
@@ -25,81 +31,86 @@ import { Usuario } from '../../interfaces/usuario';
   styleUrl: './modulo-medico.component.css',
 })
 export class ModuloMedicoComponent implements OnInit {
-  vistaHeader = true;
-  section: string = '';
-  citas: any[] = []; //desde el endpoint /citas del jsonserver
+  citas: any[] = [];
   cita: any = {};
   usuario = {} as Usuario;
+  medicoLogueado = {} as Medico;
+  idMedico: number = 0;
   query: string = '';
-  paciente = {} as Usuario;
-  rangoHoraId = {}; //segun idHorario sus rangos en numeros
+  botonActivo: string = 'proximos';
 
-  constructor(
-    private route: ActivatedRoute,
-    private apiProviderService: ApiProviderService,
-    private localServicr: LocalStorageService
-  ) {}
+  private authService = inject(AuthService);
+  private apiService = inject(ApiService);
+  private citaService = inject(CitasService);
+  private medicoService = inject(MedicosService);
+  private router = inject(Router);
+
+  constructor() {}
 
   ngOnInit(): void {
-    this.section = this.route.snapshot.routeConfig?.path || '';
-    this.getCitasMedico();
-    this.getUsuarioById();
+    this.getUsuario();
+    this.getMedicoById();
   }
 
-  //Obtener usuario del LS  //!!temporalmente
-  getUsuarioById() {
-    const usuario = localStorage.getItem('medico') || '{}';
-    this.usuario = JSON.parse(usuario);
-    console.log('Usuario:', this.usuario);
+  setActivo(nombreBoton: string) {
+    this.botonActivo = nombreBoton;
+  }
+
+  //Obtener el usuario (payload del login)
+  getUsuario(): void {
+    this.authService.usuario$.subscribe((usuario) => {
+      console.log('Usuario:', usuario);
+      if (usuario) {
+        this.usuario = usuario;
+      } else {
+        console.log('No hay usuario logueado');
+      }
+    });
+  }
+
+  //Obtener el idMedico desde la lista de medicos
+  getMedicoById() {
+    this.medicoService.getMedicos().subscribe((data: any) => {
+      this.medicoLogueado = data.find(
+        (medico: Medico) => medico.idUsuario === this.usuario.idUsuario
+      );
+      if (this.medicoLogueado) {
+        this.idMedico = this.medicoLogueado.idMedico;
+        // console.log('idMedico:', this.idMedico);
+        this.getCitasMedico(this.idMedico);
+      }
+    });
   }
 
   //Obtener turnos del LS
-  getCitasMedico() {
-    this.apiProviderService.getCitas().subscribe((data: any) => {
-      this.citas = data;
-      this.citas.forEach((cita: any) => {
-        this.getCitaDetalles(cita.idCita);
-      });
-      console.log(this.citas);
+  private getCitasMedico(id: number) {
+    this.citaService.getCitasByMedico(id).subscribe((data: any) => {
+      this.citas = data.data;
+      if (!this.citas) {
+        console.log('No hay citas');
+      } else {
+        // console.log('Citas:', this.citas);
+        this.citas.forEach((cita: Cita, index: number) => {
+          this.filterIdPaciente(cita.idPaciente, index);
+        });
+      }
     });
   }
 
-  //Obtener citas ID
-  getCitaDetalles(id: number) {
-    if (this.citas.length > 0) {
-      this.citas.find((cita: Cita) => {
-        if (cita.idCita === id) {
-          this.cita = {
-            idCita: cita.idCita,
-            fecha: cita.fecha,
-            hora: cita.hora,
-            idPaciente: cita.idPaciente,
-            idMedico: cita.idMedico,
-            motivoConsulta: cita.motivoConsulta,
-            horaCita: cita.horaCita,
-          };
-          this.getPacientePorId(cita.idPaciente);
-          this.getHorarioPorId(cita.hora);
-        }
-      });
-    }
-  }
-
-  //Obtener medico por id
-  getPacientePorId(id: number) {
-    this.apiProviderService.getUsuarioById(id).subscribe((data: any) => {
-      this.paciente = data[0];     
-      console.log('Paciente:', this.paciente);
+  private filterIdPaciente(id: number, index: number) {
+    this.apiService.getUsuarioByID(id).subscribe((data: any) => {
+      if (data.success && data.data) {
+        this.citas[index].paciente = data.data;
+        // console.log(`Paciente ${index + 1}:`, data.data);
+      } else {
+        console.log(`No se encontró información para el paciente con id ${id}`);
+      }
     });
   }
 
-  //obtener horarios por id
-  getHorarioPorId(id: any) {
-    this.apiProviderService.getHorarioById(id).subscribe((data: any) => {
-      this.rangoHoraId = {
-        rango: data[0]?.rango,
-      };
-      console.log('Horario:', this.rangoHoraId);
-    });
+  iniciarVideoConsulta(idCita: number) {
+    // console.log('Iniciar video consulta', idCita);
+    this.router.navigate(['/videollamada']);
   }
+
 }

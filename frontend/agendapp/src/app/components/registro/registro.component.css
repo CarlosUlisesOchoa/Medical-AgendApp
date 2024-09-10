@@ -1,6 +1,7 @@
 form {
   padding: 2rem 0px;
 }
+
 .card {
   width: 23rem;
 }
@@ -15,7 +16,7 @@ input.form-control {
 }
 
 input::placeholder {
-  color: #c4bfbf;
+  color: #727272;
 }
 
 a {
@@ -24,4 +25,20 @@ a {
 
 .option-menu {
   font-size: 1em;
+}
+
+input.input {
+  padding: 9px;
+  margin-right: -35px;
+}
+
+.span {
+  z-index: 999;
+}
+
+img[alt="icono-ocultar-password"],
+[alt="icono-mostrar-password"] {
+  cursor: pointer;
+  width: 24px;
+  padding-top: 0.5rem;
 }

@@ -2,7 +2,7 @@
   class="navbar d-flex justify-content-start align-items-center"
 >
   <div class="container-fluid">
-    <!-- Logo redirige a Inicio -->
+   @if(usuario && usuario.idRol == 1){
     <a [routerLink]="['/home_usuario']">
       <span>
         <img
@@ -12,9 +12,28 @@
         />
       </span>
     </a>
-    <!-- Boton menu toggle -->
-    <div class="d-flex flex-row justify-content-end align-items-center">
-      <!-- TODO: modificar por el objeto usuario id -->
+ } @else if(usuario && usuario.idRol == 2){
+    <a [routerLink]="['/home_medico']">
+      <span>
+        <img
+          src="../../../assets/img/logo.png"
+          alt="logo_empresa"
+          class="logo"
+        />
+      </span>
+    </a>
+  } @else if(usuario && usuario.idRol == 3){
+    <a [routerLink]="['/admin']">
+      <span>
+        <img
+          src="../../../assets/img/logo.png"
+          alt="logo_empresa"
+          class="logo"
+        />
+      </span>
+    </a>
+  }
+   <div class="d-flex flex-row justify-content-end align-items-center">
       @if(usuario){
       <p class="nombreUsuario p-0 m-0">{{ usuario.nombre}} {{usuario.apellido}}</p>
       }
@@ -32,14 +51,14 @@
         </span>
       </button>
     </div>
-    <!-- Menu desplegable -->
     <div class="collapse navbar-collapse" id="navbarText">
       <ul class="navbar-nav align-items-end me-4">
         <li class="nav-item">
-          <a class="nav-link" [routerLink]="['/']">Salir</a>
+          <a class="nav-link" (click)="logout()">Salir</a>
         </li>
       </ul>
     </div>
   </div>
 </nav>
+
 

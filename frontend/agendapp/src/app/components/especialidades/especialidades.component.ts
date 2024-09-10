@@ -1,9 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Component, inject, OnInit } from '@angular/core';
+import { RouterLink } from '@angular/router';
+
+import { CategoriasService } from '../../services/categorias.service';
+import { AuthService } from '../../services/auth.service';
+
 import { NavbarusuariologueadoComponent } from '../../shared/navbarusuariologueado/navbarusuariologueado.component';
-import { ApiProviderService } from '../../services/api-provider.service';
 import { FooterComponent } from '../../shared/footer/footer.component';
+
 import { Categoria } from '../../interfaces/api';
+import { Usuario } from '../../interfaces/usuario';
 
 @Component({
   selector: 'app-especialidades',
@@ -13,78 +18,55 @@ import { Categoria } from '../../interfaces/api';
   styleUrl: './especialidades.component.css',
 })
 export class EspecialidadesComponent implements OnInit {
-  section: string = ''; //registro_medicos o registro_pacientes
   especialidades: Categoria[] = [];
+  usuario: Usuario = {} as Usuario;
 
-  constructor(
-    private route: ActivatedRoute,
-    private apiProviderService: ApiProviderService,
-    private router: Router
-  ) {
-    this.section = this.route.snapshot.routeConfig?.path || '';
-  }
+  private authService = inject(AuthService);
+  private categoriaService = inject(CategoriasService);
+
+  constructor() {}
 
   ngOnInit(): void {
     this.getEspecialidades();
+    this.getUsuario();
   }
 
-
-  verEspecialidadDetalle(id: number) {
-    console.log(id);
-    this.router.navigate(['/especialidad/', id]);
-  }
-
-
-  //servicio de especialidades
-  // getEspecialidades() {
-  //   this.apiProviderService.getEspecialidades().subscribe((data: any) => {
-  //     this.especialidades = data;
-  //     console.log(this.especialidades);
-  //   });
-  // }
-
-  //Obtener especialidades de la DB
-  getEspecialidades() {
-    this.apiProviderService.getEspecialidades().subscribe((data: any) => {
-      this.especialidades = data;
-      this.especialidades = data.map((especialidad: any) => {
-        let imgSrc = '';
-        switch (especialidad.idCategoria) {
-          case 1:
-            imgSrc = '../../../assets/img/cardiology.svg';
-            break;
-          case 2:
-            imgSrc = '../../../assets/img/dermatology.svg';
-            break;
-          case 3:
-            imgSrc = '../../../assets/img/ginecology.svg';
-            break;
-          case 4:
-            imgSrc = '../../../assets/img/neurology.svg';
-            break;
-          case 5:
-            imgSrc = '../../../assets/img/neumonology.svg';
-            break;
-          case 6:
-            imgSrc = '../../../assets/img/obstetritian.svg';
-            break;
-          case 7:
-            imgSrc = '../../../assets/img/dentist.svg';
-            break;
-          case 8:
-            imgSrc = '../../../assets/img/biohazard.png';
-            break;
-          case 9:
-            imgSrc = '../../../assets/img/doctor.png';
-            break;      
-          default:
-            break;
-        }       
-        return imgSrc ? { ...especialidad, imgSrc } : especialidad;
-        });
-
+  //Obtener el usuario (payload del login)
+  getUsuario(): void {
+    this.authService.usuario$.subscribe((usuario) => {
+      if (usuario) {
+        this.usuario = usuario;
+      } else {
+        console.log('No hay usuario logueado');
+      }
     });
   }
 
 
+  getEspecialidades() {
+    const categoryImageMap: { [key: string]: string } = {
+      Cardiología: '../../../assets/img/cardiology.svg',
+      Dermatología: '../../../assets/img/dermatology.svg',
+      Endocrinología: '../../../assets/img/endocrinology.png',
+      Obstetricia: '../../../assets/img/obstetritian.svg',
+      Geriatría: '../../../assets/img/geriatrics.png',
+      Neurología: '../../../assets/img/neurology.svg',
+      Ginecologia: '../../../assets/img/ginecology.svg',
+      Radiología: '../../../assets/img/biohazard.png',
+    };
+
+    this.categoriaService.getEspecialidades().subscribe((data: any) => {
+      this.especialidades = data.data.map((especialidad: Categoria) => {
+        const imgSrc =
+          categoryImageMap[especialidad.nombre] ||
+          '../../../assets/img/logo.png';
+
+        return {
+          idCategoria: especialidad.idCategoria,
+          nombre: especialidad.nombre,
+          imgSrc: imgSrc,
+        };
+      });
+    });
+  }
 }

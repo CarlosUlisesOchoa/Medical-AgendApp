@@ -1,6 +1,8 @@
 @if(vistaHeader){
 <app-navbar></app-navbar>
-} @if(role === 'registro_usuarios'){
+}
+
+@if(section === 'registro_usuarios'){
 <div
   class="container d-flex flex-column justify-content-center align-items-center mt-2"
 >
@@ -9,6 +11,8 @@
       <div class="card-body m-0 p-0">
         <div class="wrapper mb-2">
           <input
+            minlength="4"
+            maxlength="100"
             class="form-control"
             type="text"
             name="nombre"
@@ -18,6 +22,8 @@
         </div>
         <div class="wrapper mb-2">
           <input
+            minlength="4"
+            maxlength="100"
             class="form-control"
             type="text"
             name="apellido"
@@ -27,6 +33,8 @@
         </div>
         <div class="wrapper mb-2">
           <input
+            minlength="5"
+            maxlength="100"
             class="form-control"
             type="email"
             name="email"
@@ -36,6 +44,8 @@
         </div>
         <div class="wrapper mb-2">
           <input
+            minlength="5"
+            maxlength="20"
             class="form-control"
             type="text"
             name="telefono"
@@ -45,6 +55,8 @@
         </div>
         <div class="wrapper mb-2">
           <input
+            minlength="5"
+            maxlength="20"
             class="form-control"
             type="text"
             name="dni"
@@ -52,14 +64,31 @@
             [(ngModel)]="user.dni"
           />
         </div>
-        <div class="wrapper mb-2">
+       <div class="wrapper mb-2 d-flex flex-row">
           <input
-            class="form-control"
-            type="password"
+            class="form-control input"
+            [type]="isPasswordVisible ? 'text' : 'password'"
             name="password"
             placeholder="Contraseña"
+            maxlength="100"
+            minlength="4"
+             placeholder="Contraseña"
             [(ngModel)]="user.password"
           />
+          <span (click)="togglePasswordVisibility()" class="span">
+            <span class="pe-1">
+              <img                
+                [hidden]="!isPasswordVisible"
+                src="../../../assets/img/eye-password-show.svg"
+                alt="icono-mostrar-password"
+              />
+              <img
+                [hidden]="isPasswordVisible"
+                src="../../../assets/img/eye-password-hide.svg"
+                alt="icono-ocultar-password"
+              />
+            </span>
+          </span>
         </div>
         <div
           class="container d-flex flex-column justify-content-center align-items-center"
@@ -76,7 +105,7 @@
             <a class="mb-3 pe-5" [routerLink]="['/registro_medicos']"
               >Soy Médico</a
             >
-            <a class="mb-3" [routerLink]="['/login_usuarios']"
+            <a class="mb-3" [routerLink]="['/login']"
               >Ya estoy registrado</a
             >
           </div>
@@ -87,7 +116,7 @@
 </div>
 
 <!-- mostrar formulario para medicos -->
-} @else if(role === 'registro_medicos'){
+} @else if(section === 'registro_medicos'){
 <div
   class="container d-flex flex-column justify-content-center align-items-center mt-2"
 >
@@ -96,6 +125,8 @@
       <div class="card-body m-0 p-0">
         <div class="wrapper mb-2">
           <input
+            minlength="4"
+            maxlength="100"
             class="form-control"
             type="text"
             name="nombre"
@@ -105,6 +136,8 @@
         </div>
         <div class="wrapper mb-2">
           <input
+            minlength="4"
+            maxlength="100"
             class="form-control"
             type="text"
             name="apellido"
@@ -114,6 +147,8 @@
         </div>
         <div class="wrapper mb-2">
           <input
+            minlength="5"
+            maxlength="100"
             class="form-control"
             type="email"
             name="email"
@@ -123,6 +158,8 @@
         </div>
         <div class="wrapper mb-2">
           <input
+            minlength="5"
+            maxlength="20"
             class="form-control"
             type="text"
             name="telefono"
@@ -132,6 +169,8 @@
         </div>
         <div class="wrapper mb-2">
           <input
+            minlength="5"
+            maxlength="20"
             class="form-control"
             type="text"
             name="dni"
@@ -139,14 +178,31 @@
             [(ngModel)]="medico.dni"
           />
         </div>
-        <div class="wrapper mb-2">
+       <div class="wrapper mb-2 d-flex flex-row">
           <input
-            class="form-control"
-            type="password"
+            class="form-control input"
+            [type]="isPasswordVisible ? 'text' : 'password'"
             name="password"
             placeholder="Contraseña"
-            [(ngModel)]="medico.password"
+            maxlength="100"
+            minlength="4"
+             placeholder="Contraseña"
+             [(ngModel)]="medico.password"
           />
+          <span (click)="togglePasswordVisibility()" class="span">
+            <span class="pe-1">
+               <img                
+                [hidden]="!isPasswordVisible"
+                src="../../../assets/img/eye-password-show.svg"
+                alt="icono-mostrar-password"
+              />
+              <img
+                [hidden]="isPasswordVisible"
+                src="../../../assets/img/eye-password-hide.svg"
+                alt="icono-ocultar-password"
+              />
+            </span>
+          </span>
         </div>
         <div class="wrapper mb-2">
           <select
@@ -172,7 +228,7 @@
             class="form-select"
             aria-label="Elija su horario"
             name="idHorario"
-            [(ngModel)]="medico.idHorario"
+            [(ngModel)]="medico.idHorario"            
           >
             @for(hora of horarios; track hora.idHorario){
             <option
@@ -197,7 +253,7 @@
             />
           </div>
           <div class="d-flex flex-row">
-            <a class="mb-3" [routerLink]="['/login_usuarios']"
+            <a class="mb-3" [routerLink]="['/login']"
               >Ya estoy registrado</a
             >
           </div>
